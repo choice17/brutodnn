@@ -178,7 +178,7 @@ class VOC_TRAIN_BATCH(Sequence):
                             self.config['img_c']))
         y_batch = np.empty((self.config['batch_size'],
                             self.config['num_class']))
- 
+        idx = self.generate_list[idx]
         idx_base = idx * self.config['batch_size']
         idx_top = idx_base + self.config['batch_size']
         if idx_top > self.size():
@@ -239,30 +239,31 @@ class VOC_VAL_BATCH(Sequence):
     def on_epoch_end(self):
         if self.shuffle: np.random.shuffle(self.generate_list)
 
-    def __getitem__(self, *args, **kwargs):
+    def __getitem__(self, idx):
         x_batch = np.empty((self.config['batch_size'],
                             self.config['img_h'],
                             self.config['img_w'],
                             self.config['img_c']))
         y_batch = np.empty((self.config['batch_size'],
                             self.config['num_class']))
-        while True:
-            for idx in self.generate_list:
-                idx_base = idx * self.config['batch_size']
-                idx_top = idx_base + self.config['batch_size']
-                if idx_top > self.size():
-                    idx_top = self.size()
-                    size = idx_top - idx_base
-                    x_batch = x_batch[:size, ...]
-                    y_batch = y_batch[:size, ...]
-                i = 0
-                for j in range(idx_base, idx_top):
-                    img_path = self.valid_img_list[j]
-                    img = cv2.imread(img_path)[:,:,::-1]
-                    x_batch[i, ...] = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
-                    y_batch[i, ...] = self.valid_label[j, ...]
-                    i += 1
-                yield x_batch, y_batch
+
+        #for idx in self.generate_list:
+        idx_base = idx * self.config['batch_size']
+        idx_top = idx_base + self.config['batch_size']
+        if idx_top > self.size():
+            idx_top = self.size()
+            size = idx_top - idx_base
+            x_batch = x_batch[:size, ...]
+            y_batch = y_batch[:size, ...]
+        i = 0
+        for j in range(idx_base, idx_top):
+            img_path = self.valid_img_list[j]
+            img = cv2.imread(img_path)[:,:,::-1]
+            x_batch[i, ...] = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
+            y_batch[i, ...] = self.valid_label[j, ...]
+            i += 1
+        return x_batch, y_batch
+                #yield x_batch, y_batch
 
 
 

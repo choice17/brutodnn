@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Dense, Dropout, Flatten, Activation
 
 class Lenet_Top(object):
 
-	def set(inputs, include_input=False):
+	def set(inputs):
 		"""
 		input should be XxX input
 
