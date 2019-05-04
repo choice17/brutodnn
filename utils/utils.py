@@ -4,7 +4,11 @@ import xml.etree.ElementTree as ET
 import tensorflow as tf
 import copy
 import cv2
+from PIL import Image
 
+def imshow(img):
+    a = Image.fromarray(img)
+    a.show()
 
 class BoundBox:
     def __init__(self, xmin, ymin, xmax, ymax, c = None, classes = None):

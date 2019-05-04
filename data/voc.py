@@ -171,6 +171,9 @@ class VOC_TRAIN_BATCH(Sequence):
     def on_epoch_end(self):
         if self.shuffle: np.random.shuffle(self.generate_list)
 
+    def preprocessData(self, img):
+        return img.astype(np.float32) / 255
+
     def __getitem__(self, idx):
         x_batch = np.empty((self.config['batch_size'],
                             self.config['img_h'],
@@ -190,7 +193,8 @@ class VOC_TRAIN_BATCH(Sequence):
         for j in range(idx_base, idx_top):
             img_path = self.train_img_list[j]
             img = cv2.imread(img_path)[:,:,::-1]
-            x_batch[i, ...] = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
+            img = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
+            x_batch[i, ...] = VOC.preprocessData(img)
             y_batch[i, ...] = self.train_label[j, ...]
             i += 1
         return x_batch, y_batch
@@ -259,7 +263,8 @@ class VOC_VAL_BATCH(Sequence):
         for j in range(idx_base, idx_top):
             img_path = self.valid_img_list[j]
             img = cv2.imread(img_path)[:,:,::-1]
-            x_batch[i, ...] = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
+            img = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
+            x_batch[i, ...] = VOC.preprocessData(img)
             y_batch[i, ...] = self.valid_label[j, ...]
             i += 1
         return x_batch, y_batch

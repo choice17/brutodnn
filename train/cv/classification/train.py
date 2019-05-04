@@ -1,6 +1,7 @@
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.framework.graph_util import convert_variables_to_constants
 import tensorflow as tf
+import tensorflow.keras.backend as K
 
 class Train(object):
     def __init__(self):
@@ -51,4 +52,9 @@ class Train(object):
                                                         output_names, freeze_var_names)
             return frozen_graph
 
+    def save(self, path_name, file_name):
+        frozen_graph = Train.freeze_session(K.get_session(),
+                              output_names=[out.op.name for out in self.model.outputs])
+        tf.train.write_graph(frozen_graph, path_name, file_name, as_text=False)
+        #self.saver_tf.save(self.sess, os.path.join(path_name,file_name), global_step=999)
 
