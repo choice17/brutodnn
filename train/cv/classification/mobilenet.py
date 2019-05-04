@@ -14,11 +14,11 @@ import numpy as np
 import os
 from tensorflow.python.client import device_lib
 
-BATCH_SIZE = 4
+BATCH_SIZE = 32
 NUM_CLASSES = 20
 EPOCHS = 2
 DATASET = "."
-INPUT_DIM = (224, 224, 3)
+INPUT_DIM = (192, 192, 3)
 
 config = {
     'batch_size': BATCH_SIZE,
