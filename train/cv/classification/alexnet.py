@@ -17,7 +17,7 @@ BATCH_SIZE = 64
 NUM_CLASSES = 20
 EPOCHS = 10
 DATASET = "."
-INPUT_DIM = (224, 224, 3)
+INPUT_DIM = (227, 227, 3)
 
 config = {
     'batch_size': BATCH_SIZE,
