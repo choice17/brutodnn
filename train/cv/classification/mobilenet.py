@@ -15,7 +15,7 @@ import os
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-BATCH_SIZE = 16
+BATCH_SIZE = 64
 NUM_CLASSES = 20
 EPOCHS = 10
 DATASET = "."
@@ -55,21 +55,22 @@ class Mobilenet_Train(Train):
             self.data_model.setGeneratorConfig(self.config)
 
     def initModel(self):
-        config = tf.ConfigProto( device_count = {'GPU': 1} ) 
-        sess = tf.Session(config=config) 
+        _config = tf.ConfigProto( device_count = {'GPU': 1} ) 
+        sess = tf.Session(config=_config) 
         K.set_session(sess)
-        self.model = Mobilenetv2.set(
-                        include_inputs=True,
-                        class_num=NUM_CLASSES,
-                        input_dim=INPUT_DIM,
-                        output='sigmoid'
-                        )
-        """
-        self.model = Mobilenetv2.getKerasModelBase(
-                num_class=NUM_CLASSES,
-                output='sigmoid',
-                fix_layer=20
-                )"""
+        if self.config['model_info'] == 'begin':
+            self.model = Mobilenetv2.set(
+                            include_inputs=True,
+                            class_num=NUM_CLASSES,
+                            input_dim=INPUT_DIM,
+                            output='sigmoid'
+                            )
+        elif self.config['model_info'] == 'pretained':
+            self.model = Mobilenetv2.getKerasModelBase(
+                    num_class=NUM_CLASSES,
+                    output='sigmoid',
+                    fix_layer=20
+                    )
         self.model.summary()
 
     def buildTrainKeras(self):
