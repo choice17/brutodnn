@@ -140,8 +140,8 @@ class VOC(object):
         img = img.astype(np.float32) / 255
         return img
     
-    def augment_data(img_batch):
-        img_batch = VOC.datagen.flow(img_batch)
+    def augment_data(img_batch, batch_size):
+        img_batch = VOC.datagen.flow(img_batch, batch_size=batch_size).next()
         return img_batch
 """
     def __len__(self):
@@ -225,7 +225,7 @@ class VOC_TRAIN_BATCH(Sequence):
             y_batch[i, ...] = self.train_label[j, ...]
             i += 1
         if self.augment_data:
-            x_batch = VOC.augment_data(x_batch)
+            x_batch = VOC.augment_data(x_batch, batch_size=self.config['batch_size'])
         return x_batch, y_batch
 
         """
