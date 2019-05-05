@@ -160,6 +160,10 @@ class Mobilenetv2(object):
         #x=Dense(1024,activation='relu')(x) #dense layer 2
         #x=Dense(512,activation='relu')(x) #dense layer 3
         #preds=Dense(num_class,activation=output)(x) #final layer with softmax activation
+        x = Conv2D(1024, (1, 1), padding='same')(x)
+        x = Mobilenetv2.relu6()(x)
+        x = Conv2D(1024, (1, 1), padding='same')(x)
+        x = Mobilenetv2.relu6()(x)
         x = Conv2D(num_class, (1, 1), padding='same')(x)
         x = Activation(output)(x)
         outputs = Reshape((num_class,))(x)
