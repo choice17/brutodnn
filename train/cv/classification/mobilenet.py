@@ -15,13 +15,15 @@ import os
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-BATCH_SIZE = 128
+BATCH_SIZE = 16
 NUM_CLASSES = 20
 EPOCHS = 10
 DATASET = "."
 INPUT_DIM = (224, 224, 3)
 
 config = {
+    'dataset': 'voc',
+    'model_info': 'begin',
     'batch_size': BATCH_SIZE,
     'img_h': INPUT_DIM[0],
     'img_w': INPUT_DIM[1],
@@ -45,27 +47,29 @@ class Mobilenet_Train(Train):
         self.config = config
 
     def getData(self):
-        self.voc = VOC()
-        self.voc.getFileList()
-        self.voc.getAnnot()
-        self.voc.getClassAnnot()
-        self.voc.setGeneratorConfig(self.config)
+        if self.config['dataset'] == 'voc':
+            self.data_model = VOC()
+            self.data_model.getFileList()
+            self.data_model.getAnnot()
+            self.data_model.getClassAnnot()
+            self.data_model.setGeneratorConfig(self.config)
 
     def initModel(self):
         config = tf.ConfigProto( device_count = {'GPU': 1} ) 
         sess = tf.Session(config=config) 
         K.set_session(sess)
-        """self.model = Mobilenetv2.set(
+        self.model = Mobilenetv2.set(
                         include_inputs=True,
                         class_num=NUM_CLASSES,
                         input_dim=INPUT_DIM,
                         output='sigmoid'
-                        )"""
+                        )
+        """
         self.model = Mobilenetv2.getKerasModelBase(
                 num_class=NUM_CLASSES,
                 output='sigmoid',
                 fix_layer=20
-                )
+                )"""
         self.model.summary()
 
     def buildTrainKeras(self):
@@ -107,8 +111,8 @@ class Mobilenet_Train(Train):
                                 write_graph=True, 
                                 write_images=False)
 
-        train_batch = self.voc.getTrainBatch()
-        valid_batch = self.voc.getValidBatch()
+        train_batch = self.data_model.getTrainBatch()
+        valid_batch = self.data_model.getValidBatch()
 
         self.model.fit_generator(
                     generator        = train_batch, 
