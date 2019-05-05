@@ -1,6 +1,7 @@
 import numpy as np
 import xml.etree.ElementTree as ET
 from tensorflow.keras.utils import Sequence
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import cv2
 
 voc_path = 'data/dataset/VOCdevkit/'
@@ -19,6 +20,26 @@ voc_class_key = {key:item for item, key in enumerate(voc_class)}
 voc_class_idx = np.zeros((len(voc_class)))
 
 class VOC(object):
+
+    datagen = ImageDataGenerator(
+                featurewise_center=False,
+                samplewise_center=False,
+                featurewise_std_normalization=False,
+                samplewise_std_normalization=False,
+                zca_whitening=False,
+                zca_epsilon=1e-6,
+                rotation_range=30,
+                width_shift_range=0.1,
+                height_shift_range=0.1,
+                shear_range=0.3,
+                zoom_range=0.1,
+                channel_shift_range=30,
+                fill_mode='nearest',
+                cval=0.,
+                horizontal_flip=True,
+                vertical_flip=False,
+                rescale=None,
+                preprocessing_function=None)
 
     def __init__(self, *args, **kwargs):
         super(VOC, self).__init__(*args, **kwargs)
@@ -116,8 +137,12 @@ class VOC(object):
         return VOC_VAL_BATCH(self)
 
     def preprocessData(img):
-        return img.astype(np.float32) / 255
-
+        img = img.astype(np.float32) / 255
+        return img
+    
+    def augment_data(img_batch):
+        img_batch = VOC.datagen.flow(img_batch)
+        return img_batch
 """
     def __len__(self):
         return int((self.train_label.shape[0] / self.config['batch_size']) + 0.5)
@@ -197,6 +222,8 @@ class VOC_TRAIN_BATCH(Sequence):
             x_batch[i, ...] = VOC.preprocessData(img)
             y_batch[i, ...] = self.train_label[j, ...]
             i += 1
+        if self.augment_data:
+            x_batch = VOC.augment_data(x_batch)
         return x_batch, y_batch
 
         """
@@ -233,6 +260,7 @@ class VOC_VAL_BATCH(Sequence):
         self.valid_img_list = voc.valid_img_list
         self.shuffle = voc.config['shuffle']
         self.generate_list = list(range(len(self)))
+        self.augment_data = 0
 
     def __len__(self):
         return int((self.valid_label.shape[0] / self.config['batch_size']) + 0.5)
@@ -242,6 +270,7 @@ class VOC_VAL_BATCH(Sequence):
 
     def on_epoch_end(self):
         if self.shuffle: np.random.shuffle(self.generate_list)
+        self.augment_data = 1
 
     def __getitem__(self, idx):
         x_batch = np.empty((self.config['batch_size'],
