@@ -37,7 +37,7 @@ class Alexnet(object):
             inputs = Input(shape=INPUT_DIM)
         x = Alexnet.getBase(inputs)
         x = Alexnet.getTop(x)
-        x = Dense(CLASS_NUM, activation=output)(x)
+        x = Dense(class_num, activation=output)(x)
         model = Model(inputs, x)
         return model
 
