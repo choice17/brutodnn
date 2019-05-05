@@ -37,7 +37,7 @@ class Alexnet(object):
 
     def set(inputs=None, include_inputs=False, class_num=CLASS_NUM, output='softmax', input_dim=INPUT_DIM):
         if include_inputs:
-            inputs = Input(shape=INPUT_DIM)
+            inputs = Input(shape=input_dim)
         x = Alexnet.getBase(inputs)
         x = Alexnet.getTop(x)
         x = Dense(class_num, activation=output)(x)
