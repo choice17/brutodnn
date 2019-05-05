@@ -13,9 +13,9 @@ import numpy as np
 import os
 from tensorflow.python.client import device_lib
 
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 NUM_CLASSES = 20
-EPOCHS = 1
+EPOCHS = 10
 DATASET = "."
 INPUT_DIM = (224, 224, 3)
 
@@ -25,7 +25,7 @@ config = {
     'img_w': INPUT_DIM[1],
     'img_c': INPUT_DIM[2],
     'num_class': NUM_CLASSES,
-    'epoch': EPOCHS,
+    'epochs': EPOCHS,
     'shuffle': 1
 }
 
