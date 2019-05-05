@@ -31,6 +31,14 @@ config = {
     'shuffle': 1
 }
 
+path_name = "tmp"
+model_name = "mobilenet"
+file_name = "mobilenetv2.pb"
+log_path = 'logs'
+
+if not os.path.exists(path_name): os.mkdir(path_name)
+if not os.path.exists(log_path): os.mkdir(log_path)
+
 class Mobilenet_Train(Train):
 
     def __init__(self):
@@ -69,7 +77,7 @@ class Mobilenet_Train(Train):
               metrics=['accuracy'])
 
     def fit(self):
-        file = 'tmp/mobilenetv2-best.h5'
+        file = path_name + '/' + mobilenetv2-best.h5
         if os.path.exists(file):
             self.model.load_weights(file)
             fix_layer = 20
@@ -94,7 +102,7 @@ class Mobilenet_Train(Train):
                                     mode='min', 
                                     period=1)
         tb_counter  = 1
-        tensorboard = TensorBoard(log_dir='logs/' + 'mobilenetv2' + '_' + str(tb_counter), 
+        tensorboard = TensorBoard(log_dir=log_path +'/' + model_name + '_' + str(tb_counter), 
                                 histogram_freq=0, 
                                 write_graph=True, 
                                 write_images=False)
@@ -117,4 +125,4 @@ class Mobilenet_Train(Train):
         self.getData()
         self.buildTrainKeras()
         self.fit()
-        self.save(file_name='mobilenetv2.pb', path_name='tmp')
+        self.save(file_name=file_name, path_name=path_name)
