@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 from tensorflow.keras.utils import Sequence
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import cv2
+from utils.utils import imshow
 
 voc_path = 'data/dataset/VOCdevkit/'
 voc_2012_image_folder = 'VOC2012/JPEGImages/'
@@ -43,7 +44,7 @@ class VOC(object):
 
     def __init__(self, *args, **kwargs):
         super(VOC, self).__init__(*args, **kwargs)
-        self.voc_clas = voc_class
+        self.voc_class = voc_class
         self.dirs = {
             'voc_path': voc_path,
             'voc_2012_image_folder': voc_2012_image_folder,
@@ -221,11 +222,12 @@ class VOC_TRAIN_BATCH(Sequence):
             img_path = self.train_img_list[j]
             img = cv2.imread(img_path)[:,:,::-1]
             img = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
-            x_batch[i, ...] = VOC.preprocessData(img)
+            x_batch[i, ...] = img
             y_batch[i, ...] = self.train_label[j, ...]
             i += 1
         if self.augment_data:
             x_batch = VOC.augment_data(x_batch, batch_size=self.config['batch_size'])
+        x_batch = VOC.preprocessData(x_batch)
         return x_batch, y_batch
 
         """
@@ -294,9 +296,10 @@ class VOC_VAL_BATCH(Sequence):
             img_path = self.valid_img_list[j]
             img = cv2.imread(img_path)[:,:,::-1]
             img = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
-            x_batch[i, ...] = VOC.preprocessData(img)
+            x_batch[i, ...] = img
             y_batch[i, ...] = self.valid_label[j, ...]
             i += 1
+        x_batch = VOC.preprocessData(x_batch)
         return x_batch, y_batch
                 #yield x_batch, y_batch
 
