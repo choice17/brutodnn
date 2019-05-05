@@ -189,6 +189,7 @@ class VOC_TRAIN_BATCH(Sequence):
         self.train_img_list = voc.train_img_list
         self.shuffle = voc.config['shuffle']
         self.generate_list = list(range(len(self)))
+        self.augment_data = 0
 
     def __len__(self):
         return int((self.train_label.shape[0] / self.config['batch_size']) + 0.5)
@@ -260,7 +261,6 @@ class VOC_VAL_BATCH(Sequence):
         self.valid_img_list = voc.valid_img_list
         self.shuffle = voc.config['shuffle']
         self.generate_list = list(range(len(self)))
-        self.augment_data = 0
 
     def __len__(self):
         return int((self.valid_label.shape[0] / self.config['batch_size']) + 0.5)
