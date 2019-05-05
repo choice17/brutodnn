@@ -3,7 +3,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, GlobalAveragePooling2D, Dropout, ReLU
 from tensorflow.keras.layers import Activation, BatchNormalization, add, Reshape, DepthwiseConv2D
 #from tensorflow.keras.applications.mobilenet import relu6, DepthwiseConv2D
-from keras.utils.vis_utils import plot_model
+#from keras.utils.vis_utils import plot_model
 from tensorflow.keras import backend as K
 from tensorflow.keras.applications import MobileNetV2
 
@@ -145,7 +145,7 @@ class Mobilenetv2(object):
         x = Activation(output)(x)
         outputs = Reshape((class_num,))(x)
         model = Model(inputs, outputs)
-        plot_model(model, to_file='images/MobileNetv2.png', show_shapes=True)
+        #plot_model(model, to_file='images/MobileNetv2.png', show_shapes=True)
         return model
 
     def getKerasModel(*args, **kwargs):
