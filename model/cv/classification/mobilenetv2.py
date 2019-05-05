@@ -17,7 +17,7 @@ def _make_divisible(v, divisor, min_value=None):
         min_value = divisor
     new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
     # Make sure that round down does not go down by more than 10%.
-    if new_v < 0.9 * v:
+    if new_v < 0.9 * v:-o
         new_v += divisor
     return new_v
 """
@@ -25,7 +25,7 @@ def _make_divisible(v, divisor, min_value=None):
 class Mobilenetv2(object):
 
     def relu6(*args, **kwargs):
-        return ReLU(6., *args, **kargs)
+        return ReLU(6., *args, **kwargs)
 
     def _conv_block(inputs, filters, kernel, strides):
         """Convolution Block
