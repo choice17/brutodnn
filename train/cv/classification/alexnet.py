@@ -39,12 +39,15 @@ if not os.path.exists(log_path): os.mkdir(log_path)
 
 class Alexnet_Train(Train):
 
+    def __init__(self):
+        self.config = config
+
     def getData(self):
         self.voc = VOC()
         self.voc.getFileList()
         self.voc.getAnnot()
         self.voc.getClassAnnot()
-        self.voc.setGeneratorConfig(config)
+        self.voc.setGeneratorConfig(self.config)
 
     def initModel(self):
         self.model = Alexnet.set(
