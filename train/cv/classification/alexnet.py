@@ -29,6 +29,14 @@ config = {
     'shuffle': 1
 }
 
+path_name = "tmp"
+model_name = "alexnet"
+file_name = "alexnet.pb"
+log_path = 'logs'
+
+if not os.path.exists(path_name): os.mkdir(path_name)
+if not os.path.exists(log_path): os.mkdir(log_path)
+
 class Alexnet_Train(Train):
 
     def getData(self):
@@ -56,6 +64,10 @@ class Alexnet_Train(Train):
               metrics=['accuracy'])
 
     def fit(self):
+        file = path_name + '/' + model_name + '-best.h5'
+        if os.path.exists(file):
+            self.model.load_weights(file)
+
         early_stop = EarlyStopping(monitor='val_loss', 
                            min_delta=0.001, 
                            patience=3, 
@@ -69,7 +81,7 @@ class Alexnet_Train(Train):
                                     mode='min', 
                                     period=1)
         tb_counter  = 1
-        tensorboard = TensorBoard(log_dir='logs/' + 'alexnet' + '_' + str(tb_counter), 
+        tensorboard = TensorBoard(log_dir=log_path + '/' + model_name + '_' + str(tb_counter), 
                                 histogram_freq=0, 
                                 write_graph=True, 
                                 write_images=False)
@@ -80,7 +92,7 @@ class Alexnet_Train(Train):
         self.model.fit_generator(
                     generator        = train_batch, 
                     steps_per_epoch  = len(train_batch), 
-                    epochs           = 1, 
+                    epochs           = self.config['epochs'], 
                     verbose          = 1,
                     validation_data  = valid_batch,
                     validation_steps = len(valid_batch),
@@ -92,4 +104,4 @@ class Alexnet_Train(Train):
         self.getData()
         self.buildTrainKeras()
         self.fit()
-        self.save()
+        self.save(file_name=file_name, path_name=path_name)
