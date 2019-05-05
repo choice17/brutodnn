@@ -199,6 +199,7 @@ class VOC_TRAIN_BATCH(Sequence):
 
     def on_epoch_end(self):
         if self.shuffle: np.random.shuffle(self.generate_list)
+        self.augment_data = 1
 
     def __getitem__(self, idx):
         x_batch = np.empty((self.config['batch_size'],
