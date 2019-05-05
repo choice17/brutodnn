@@ -30,7 +30,7 @@ class Alexnet(object):
     def getTop(inputs):
         x = Flatten()(inputs)
         x = Dense(4096,activation='relu')(x)
-        x = Dropout(rete=0.3)(x)
+        x = Dropout(rate=0.3)(x)
         x = Dense(4096,activation='relu')(x)
         x = Dropout(rate=0.3)(x)
         return x
