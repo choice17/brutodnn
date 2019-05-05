@@ -54,19 +54,14 @@ class Alexnet_Train(Train):
         config = tf.ConfigProto( device_count = {'GPU': 1} ) 
         sess = tf.Session(config=config) 
         K.set_session(sess)
-        model = Alexnet.getKerasModelBase(
-                num_class=NUM_CLASSES,
-                output='sigmoid',
-                fix_layer=6
-                )
-        """
+
         self.model = Alexnet.set(
                         include_inputs=True,
                         class_num=NUM_CLASSES,
                         input_dim=INPUT_DIM,
                         output='sigmoid'
                         )
-        """
+
         self.model.summary()
 
     def buildTrainKeras(self):
