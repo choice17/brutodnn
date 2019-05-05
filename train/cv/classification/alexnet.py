@@ -3,7 +3,7 @@ from train.cv.classification.train import Train
 from data.voc import VOC
 
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 
@@ -65,8 +65,8 @@ class Alexnet_Train(Train):
         self.model.summary()
 
     def buildTrainKeras(self):
-        optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        #optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
+        #optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
         self.model.compile(loss='categorical_crossentropy',
               optimizer=optimizer,

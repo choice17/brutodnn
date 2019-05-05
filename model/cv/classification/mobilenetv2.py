@@ -47,7 +47,7 @@ class Mobilenetv2(object):
 
         x = Conv2D(filters, kernel, padding='same', strides=strides)(inputs)
         x = BatchNormalization(axis=channel_axis)(x)
-        return Activation(Mobilenetv2.relu6)(x)
+        return Mobilenetv2.relu6()(x)
 
 
     def _bottleneck(inputs, filters, kernel, t, s, r=False):
