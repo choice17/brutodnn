@@ -2,6 +2,9 @@ import numpy as np
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dropout, Dense, Input, Flatten
 from tensorflow.keras.models import Model
 
+from tensorflow.keras import backend as K
+from tensorflow.keras.applications import AlexNet
+
 INPUT_DIM = (227, 227, 3)
 CLASS_NUM = 1000
 
@@ -41,4 +44,17 @@ class Alexnet(object):
         model = Model(inputs, x)
         return model
 
-
+    def getKerasModelBase(num_class=CLASS_NUM, output='softmax', fix_layer=6):
+        base_model=AlexNet(weights='imagenet',include_top=False) #imports the mobilenet model and discards the last 1000 neuron layer.
+        x=base_model.output
+        x = Dense(num_class, activation=output)(x)
+        outputs = Reshape((num_class,))(x)
+        model=Model(inputs=base_model.input,outputs=outputs)
+        for layer in model.layers:
+            layer.trainable=False
+        # or if we want to set the first 20 layers of the network to be non-trainable
+        for layer in model.layers[:fix_layer]:
+            layer.trainable=False
+        for layer in model.layers[fix_layer:]:
+            layer.trainable=True
+        return model

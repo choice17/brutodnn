@@ -12,10 +12,11 @@ import numpy as np
 
 import os
 from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 
-BATCH_SIZE = 64
+BATCH_SIZE = 4
 NUM_CLASSES = 20
-EPOCHS = 10
+EPOCHS = 1
 DATASET = "."
 INPUT_DIM = (227, 227, 3)
 
@@ -50,12 +51,22 @@ class Alexnet_Train(Train):
         self.voc.setGeneratorConfig(self.config)
 
     def initModel(self):
+        config = tf.ConfigProto( device_count = {'GPU': 1} ) 
+        sess = tf.Session(config=config) 
+        K.set_session(sess)
+        model = Alexnet.getKerasModelBase(
+                num_class=NUM_CLASSES,
+                output='sigmoid',
+                fix_layer=6
+                )
+        """
         self.model = Alexnet.set(
                         include_inputs=True,
                         class_num=NUM_CLASSES,
                         input_dim=INPUT_DIM,
                         output='sigmoid'
                         )
+        """
         self.model.summary()
 
     def buildTrainKeras(self):
@@ -77,7 +88,7 @@ class Alexnet_Train(Train):
                            mode='min', 
                            verbose=1)
 
-        checkpoint = ModelCheckpoint('alexnet.h5', 
+        checkpoint = ModelCheckpoint(path_name + '/' + model_name + '.h5', 
                                     monitor='val_loss', 
                                     verbose=1, 
                                     save_best_only=True, 
