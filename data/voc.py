@@ -130,11 +130,38 @@ class VOC(object):
         """
         self.config = config
         self.shuffle = config['shuffle']
+        if self.config['data_mode'] == 'on_memory':
+            self.getImage()
+
+    def getImage(self):
+        _len = len(self.train_annot)
+        self.train_images = np.zeros((_len,
+                            self.config['img_h'],
+                            self.config['img_w'],
+                            self.config['img_c'])))
+        for j in range(_len):
+            img_path = self.train_img_list[j]
+            img = cv2.imread(img_path)
+            self.train_images[j, ...] = img
+        
+        _len = len(self.valid_annot)
+        self.valid_images = np.zeros((_len,
+                            self.config['img_h'],
+                            self.config['img_w'],
+                            self.config['img_c'])))
+        for j in range(_len):
+            img_path = self.train_img_list[j]
+            img = cv2.imread(img_path)
+            self.valid_images[j, ...] = img
 
     def getTrainBatch(self):
+        if self.config['data_mode'] == 'on_memory':
+            return self.train_image
         return VOC_TRAIN_BATCH(self)
 
     def getValidBatch(self):
+        if self.config['data_mode'] == 'on_memory':
+            return self.valid_images
         return VOC_VAL_BATCH(self)
 
     def preprocessData(img):

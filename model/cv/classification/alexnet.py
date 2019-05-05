@@ -17,13 +17,13 @@ class Alexnet(object):
         if include_inputs:
             inputs = Input(shape=INPUT_DIM)
 
-        x = Conv2D(96, (11, 11), strides=(4, 4), padding='valid', activation='relu', kernel_initializer='uniform')(inputs)
+        x = Conv2D(96, (11, 11), strides=(4, 4), padding='valid', activation='relu')(inputs)
         x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
-        x = Conv2D(256, (5, 5), strides=(1, 1), padding='same', activation='relu', kernel_initializer='uniform')(x)
+        x = Conv2D(256, (5, 5), strides=(1, 1), padding='same', activation='relu')(x)
         x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
-        x = Conv2D(384, (3, 3), strides=(1, 1), padding='same', activation='relu', kernel_initializer='uniform')(x)
-        x = Conv2D(384, (3, 3), strides=(1, 1), padding='same', activation='relu', kernel_initializer='uniform')(x)
-        x = Conv2D(256, (3, 3), strides=(1, 1), padding='same', activation='relu', kernel_initializer='uniform')(x)
+        x = Conv2D(384, (3, 3), strides=(1, 1), padding='same', activation='relu')(x)
+        x = Conv2D(384, (3, 3), strides=(1, 1), padding='same', activation='relu')(x)
+        x = Conv2D(256, (3, 3), strides=(1, 1), padding='same', activation='relu')(x)
         x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
         return x
 

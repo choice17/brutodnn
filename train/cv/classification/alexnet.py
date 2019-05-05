@@ -21,6 +21,8 @@ DATASET = "."
 INPUT_DIM = (227, 227, 3)
 
 config = {
+    'dataset': 'voc',
+    'data_mode': 'on_memory',
     'batch_size': BATCH_SIZE,
     'img_h': INPUT_DIM[0],
     'img_w': INPUT_DIM[1],
@@ -66,7 +68,7 @@ class Alexnet_Train(Train):
 
     def buildTrainKeras(self):
         #optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
+        optimizer = SGD(lr=1e-3, decay=0.0005, momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
         self.model.compile(loss='categorical_crossentropy',
               optimizer=optimizer,
