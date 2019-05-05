@@ -77,7 +77,7 @@ class Mobilenet_Train(Train):
               metrics=['accuracy'])
 
     def fit(self):
-        file = path_name + '/' + mobilenetv2-best.h5
+        file = path_name + '/' + model_name + '-best.h5'
         if os.path.exists(file):
             self.model.load_weights(file)
             fix_layer = 20
