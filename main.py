@@ -3,10 +3,12 @@ from train.cv.classification.alexnet import Alexnet_Train
 from train.cv.classification.mobilenet import Mobilenet_Train
 import sys
 
-if len(sys.argv) == 3:
-    if sys.argv[2] == 'mobilenet':
+if len(sys.argv) == 2:
+    if sys.argv[1] == 'mobilenet':
+        print("selected mobilenet")
         train = Mobilenet_Train()
-    elif sys.argv[2] == 'alexnet':
+    elif sys.argv[1] == 'alexnet':
+        print("Selected Alexnet")
         train = Alexnet_Train()
 else:
 #main()
