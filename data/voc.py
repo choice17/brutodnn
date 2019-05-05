@@ -115,6 +115,9 @@ class VOC(object):
     def getValidBatch(self):
         return VOC_VAL_BATCH(self)
 
+    def preprocessData(img):
+        return img.astype(np.float32) / 255
+
 """
     def __len__(self):
         return int((self.train_label.shape[0] / self.config['batch_size']) + 0.5)
@@ -170,9 +173,6 @@ class VOC_TRAIN_BATCH(Sequence):
 
     def on_epoch_end(self):
         if self.shuffle: np.random.shuffle(self.generate_list)
-
-    def preprocessData(self, img):
-        return img.astype(np.float32) / 255
 
     def __getitem__(self, idx):
         x_batch = np.empty((self.config['batch_size'],
