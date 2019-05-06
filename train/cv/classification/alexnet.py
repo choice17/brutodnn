@@ -22,7 +22,7 @@ INPUT_DIM = (227, 227, 3)
 
 config = {
     'dataset': 'voc',
-    'data_mode': 'on_memory',
+    'data_mode': 'none',
     'batch_size': BATCH_SIZE,
     'img_h': INPUT_DIM[0],
     'img_w': INPUT_DIM[1],

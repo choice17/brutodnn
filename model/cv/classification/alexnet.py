@@ -27,19 +27,19 @@ class Alexnet(object):
         x = MaxPooling2D(pool_size=(3, 3), strides=(2, 2))(x)
         return x
 
-    def getTop(inputs):
+    def getTop(inputs, dropout):
         x = Flatten()(inputs)
         x = Dense(4096,activation='relu')(x)
-        x = Dropout(rate=0.3)(x)
+        if dropout: x = Dropout(rate=0.3)(x)
         x = Dense(4096,activation='relu')(x)
-        x = Dropout(rate=0.3)(x)
+        if dropout: x = Dropout(rate=0.3)(x)
         return x
 
-    def set(inputs=None, include_inputs=False, class_num=CLASS_NUM, output='softmax', input_dim=INPUT_DIM):
+    def set(inputs=None, include_inputs=False, class_num=CLASS_NUM, output='softmax', input_dim=INPUT_DIM, dropout=1):
         if include_inputs:
             inputs = Input(shape=input_dim)
         x = Alexnet.getBase(inputs)
-        x = Alexnet.getTop(x)
+        x = Alexnet.getTop(x, dropout)
         x = Dense(class_num, activation=output)(x)
         model = Model(inputs, x)
         return model
