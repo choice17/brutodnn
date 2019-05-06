@@ -85,7 +85,7 @@ class Alexnet_Train(Train):
                            mode='min', 
                            verbose=1)
 
-        checkpoint = ModelCheckpoint(path_name + '/' + model_name + '.h5', 
+        checkpoint = ModelCheckpoint(path_name + '/' + model_name + '-best.h5', 
                                     monitor='val_loss', 
                                     verbose=1, 
                                     save_best_only=True, 
