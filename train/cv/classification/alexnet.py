@@ -67,8 +67,8 @@ class Alexnet_Train(Train):
         self.model.summary()
 
     def buildTrainKeras(self):
-        #optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        optimizer = SGD(lr=1e-3, decay=0.0005, momentum=0.9)
+        optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        #optimizer = SGD(lr=1e-3, decay=0.0005, momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
         self.model.compile(loss='categorical_crossentropy',
               optimizer=optimizer,
@@ -100,15 +100,27 @@ class Alexnet_Train(Train):
         train_batch = self.voc.getTrainBatch()
         valid_batch = self.voc.getValidBatch()
 
-        self.model.fit_generator(
-                    generator        = train_batch, 
-                    steps_per_epoch  = len(train_batch), 
-                    epochs           = self.config['epochs'], 
-                    verbose          = 1,
-                    validation_data  = valid_batch,
-                    validation_steps = len(valid_batch),
-                    callbacks        = [early_stop, checkpoint, tensorboard], 
-                    max_queue_size   = 3)
+        if self.config['data_mode'] == 'on_memory':
+            tr_x, tr_y = train_batch
+            tst_x, tst_y = valid_batch
+            self.history = self.model.fit(
+                        tr_x, tr_y,
+                        batch_size       = self.config['batch_size'], 
+                        epochs           = self.config['epochs'], 
+                        verbose          = 1,
+                        validation_data  = (tst_x, tst_y),
+                        callbacks        = [early_stop, checkpoint, tensorboard], 
+                        max_queue_size   = 3)
+        else:
+            self.history = self.model.fit_generator(
+                        generator        = train_batch, 
+                        steps_per_epoch  = len(train_batch), 
+                        epochs           = self.config['epochs'], 
+                        verbose          = 1,
+                        validation_data  = valid_batch,
+                        validation_steps = len(valid_batch),
+                        callbacks        = [early_stop, checkpoint, tensorboard], 
+                        max_queue_size   = 3)
 
     def run(self):
         self.initModel()

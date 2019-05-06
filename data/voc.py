@@ -138,30 +138,32 @@ class VOC(object):
         self.train_images = np.zeros((_len,
                             self.config['img_h'],
                             self.config['img_w'],
-                            self.config['img_c'])))
+                            self.config['img_c']))
         for j in range(_len):
             img_path = self.train_img_list[j]
-            img = cv2.imread(img_path)
+            img = cv2.imread(img_path)[:,:,::-1]
+            img = cv2.resize(img, (self.config['img_w'],self.config['img_h']))
             self.train_images[j, ...] = img
         
         _len = len(self.valid_annot)
         self.valid_images = np.zeros((_len,
                             self.config['img_h'],
                             self.config['img_w'],
-                            self.config['img_c'])))
+                            self.config['img_c']))
         for j in range(_len):
             img_path = self.train_img_list[j]
             img = cv2.imread(img_path)
+            img = cv2.resize(img, (self.config['img_w'],self.config['img_h']))
             self.valid_images[j, ...] = img
 
     def getTrainBatch(self):
         if self.config['data_mode'] == 'on_memory':
-            return self.train_image
+            return self.train_image, self.train_label
         return VOC_TRAIN_BATCH(self)
 
     def getValidBatch(self):
         if self.config['data_mode'] == 'on_memory':
-            return self.valid_images
+            return self.valid_images, self.valid_label
         return VOC_VAL_BATCH(self)
 
     def preprocessData(img):
@@ -219,32 +221,6 @@ class VOC_TRAIN_BATCH(Sequence):
             x_batch, y_batch = VOC.augment_data(x_batch, y_batch, batch_size=self.config['batch_size'])
         x_batch = VOC.preprocessData(x_batch)
         return x_batch, y_batch
-
-        """
-        x_batch = np.empty((self.config['batch_size'],
-                            self.config['img_h'],
-                            self.config['img_w'],
-                            self.config['img_c']))
-        y_batch = np.empty((self.config['batch_size'],
-                            self.config['num_class']))
-        while True:
-            for idx in self.generate_list:
-                idx_base = idx * self.config['batch_size']
-                idx_top = idx_base + self.config['batch_size']
-                if idx_top > self.size():
-                    idx_top = self.size()
-                    size = idx_top - idx_base
-                    x_batch = x_batch[:size, ...]
-                    y_batch = y_batch[:size, ...]
-                i = 0
-                for j in range(idx_base, idx_top):
-                    img_path = self.train_img_list[j]
-                    img = cv2.imread(img_path)[:,:,::-1]
-                    x_batch[i, ...] = cv2.resize(img, (self.config['img_w'], self.config['img_h']))
-                    y_batch[i, ...] = self.train_label[j, ...]
-                    i += 1
-                yield x_batch, y_batch
-        """
 
 class VOC_VAL_BATCH(Sequence):
 
