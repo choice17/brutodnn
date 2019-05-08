@@ -1,3 +1,9 @@
+"""
+https://github.com/LevinJ/SSD_tensorflow_VOC
+training gitproject
+
+"""
+
 import numpy as np
 import xml.etree.ElementTree as ET
 from tensorflow.keras.utils import Sequence
@@ -74,7 +80,7 @@ class VOC(object):
                 samplewise_std_normalization=False,
                 zca_whitening=False,
                 zca_epsilon=1e-6,
-                rotation_range=30,
+                rotation_range=20,
                 width_shift_range=0.1,
                 height_shift_range=0.1,
                 shear_range=0.3,
@@ -90,9 +96,9 @@ class VOC(object):
     VOC_2007 = VOC_2007
     VOC_2012 = VOC_2012
     VOC_ALL  = VOC_ALL
-
+    voc_class = voc_class
     def __init__(self, voc_data= VOC_2012):
-        self.voc_class = voc_class
+
         self.dirs = {'voc_path': voc_path }
 
         if voc_data == VOC_2012:

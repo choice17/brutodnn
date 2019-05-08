@@ -14,9 +14,9 @@ import os
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-BATCH_SIZE = 4
+BATCH_SIZE = 16
 NUM_CLASSES = 20
-EPOCHS = 1
+EPOCHS = 60
 DATASET = "."
 INPUT_DIM = (227, 227, 3)
 
@@ -29,7 +29,11 @@ config = {
     'img_c': INPUT_DIM[2],
     'num_class': NUM_CLASSES,
     'epochs': EPOCHS,
-    'shuffle': 1
+    'lr': 1e-4,
+    'decay': 1 / EPOCHS,
+    'shuffle': 1,
+    'do_augment': 1,
+    'dropout':1
 }
 
 path_name = "tmp"
@@ -67,8 +71,8 @@ class Alexnet_Train(Train):
         self.model.summary()
 
     def buildTrainKeras(self):
-        optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-        #optimizer = SGD(lr=1e-3, decay=0.0005, momentum=0.9)
+        #optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        optimizer = SGD(lr=self.config['lr'], decay=self.config['decay'], momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
         self.model.compile(loss='categorical_crossentropy',
               optimizer=optimizer,
@@ -80,8 +84,8 @@ class Alexnet_Train(Train):
             self.model.load_weights(file)
 
         early_stop = EarlyStopping(monitor='val_loss', 
-                           min_delta=0.001, 
-                           patience=3, 
+                           min_delta=0.0001, 
+                           patience=20, 
                            mode='min', 
                            verbose=1)
 
@@ -96,6 +100,11 @@ class Alexnet_Train(Train):
                                 histogram_freq=0, 
                                 write_graph=True, 
                                 write_images=False)
+        
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                              patience=2, min_lr=0.000001, verbose=1,
+                                     cooldown=1)
+        
 
         train_batch = self.voc.getTrainBatch()
         valid_batch = self.voc.getValidBatch()
@@ -109,7 +118,7 @@ class Alexnet_Train(Train):
                         epochs           = self.config['epochs'], 
                         verbose          = 1,
                         validation_data  = (tst_x, tst_y),
-                        callbacks        = [early_stop, checkpoint, tensorboard], 
+                        callbacks        = [early_stop, checkpoint, tensorboard, reduce_lr], 
                         max_queue_size   = 3)
         else:
             self.history = self.model.fit_generator(
@@ -119,7 +128,7 @@ class Alexnet_Train(Train):
                         verbose          = 1,
                         validation_data  = valid_batch,
                         validation_steps = len(valid_batch),
-                        callbacks        = [early_stop, checkpoint, tensorboard], 
+                        callbacks        = [early_stop, checkpoint, tensorboard, reduce_lr], 
                         max_queue_size   = 3)
 
     def run(self):
