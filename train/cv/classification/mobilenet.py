@@ -13,7 +13,7 @@ import numpy as np
 
 import os
 from tensorflow.python.client import device_lib
-
+print(device_lib.list_local_devices())
 BATCH_SIZE = 4
 NUM_CLASSES = 20
 EPOCHS = 2

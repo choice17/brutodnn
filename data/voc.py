@@ -57,7 +57,7 @@ class VOC(object):
         self.valid_annot_list = []
         for l in img_list:
             if l:
-                img_path = '%s%s%s' % (self.dirs['voc_path'],
+                img_path = '%s%s%s.jpg' % (self.dirs['voc_path'],
                         self.dirs['voc_2012_image_folder'], l)
                 self.valid_img_list.append(img_path)
                 annot_path = '%s%s%s.xml' % (self.dirs['voc_path'],
