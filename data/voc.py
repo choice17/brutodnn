@@ -251,7 +251,7 @@ class VOC(object):
         return VOC_VAL_BATCH(self)
 
     def preprocessData(img):
-        img = img.astype(np.float32) / 255 - 0.5
+        #img = img.astype(np.float32) / 255 - 0.5
         return img
     
     def augment_data(img_batch, y_batch, batch_size):
