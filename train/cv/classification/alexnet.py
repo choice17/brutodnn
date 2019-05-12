@@ -5,7 +5,7 @@ from data.voc import VOC
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras import backend as K
-from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 
 import tensorflow as tf
 import numpy as np
@@ -14,9 +14,9 @@ import os
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 NUM_CLASSES = 20
-EPOCHS = 60
+EPOCHS = 1
 DATASET = "."
 INPUT_DIM = (227, 227, 3)
 
@@ -33,7 +33,9 @@ config = {
     'decay': 1 / EPOCHS,
     'shuffle': 1,
     'do_augment': 1,
-    'dropout':1
+    'dropout':1,
+    'output_func':'sigmoid',
+    'loss':'binary_crossentropy'
 }
 
 path_name = "tmp"
@@ -45,6 +47,13 @@ if not os.path.exists(path_name): os.mkdir(path_name)
 if not os.path.exists(log_path): os.mkdir(log_path)
 
 class Alexnet_Train(Train):
+
+    def focal_loss(gamma=2., alpha=.25):
+        def focal_loss_fixed(y_true, y_pred):
+            pt_1 = tf.where(tf.equal(y_true, 1), y_pred, tf.ones_like(y_pred))
+            pt_0 = tf.where(tf.equal(y_true, 0), y_pred, tf.zeros_like(y_pred))
+            return -K.sum(alpha * K.pow(1. - pt_1, gamma) * K.log(pt_1))-K.sum((1-alpha) * K.pow( pt_0, gamma) * K.log(1. - pt_0))
+        return focal_loss_fixed
 
     def __init__(self):
         self.config = config
@@ -65,7 +74,7 @@ class Alexnet_Train(Train):
                         include_inputs=True,
                         class_num=NUM_CLASSES,
                         input_dim=INPUT_DIM,
-                        output='sigmoid'
+                        output=self.config['output_func']
                         )
 
         self.model.summary()
@@ -74,7 +83,7 @@ class Alexnet_Train(Train):
         #optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         optimizer = SGD(lr=self.config['lr'], decay=self.config['decay'], momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
-        self.model.compile(loss='categorical_crossentropy',
+        self.model.compile(loss=self.config['loss'], #'binary_crossentropy',
               optimizer=optimizer,
               metrics=['accuracy'])
 
