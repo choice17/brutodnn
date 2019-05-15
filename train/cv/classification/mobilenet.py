@@ -15,23 +15,24 @@ import os
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-BATCH_SIZE = 64
+BATCH_SIZE = 8
 NUM_CLASSES = 20
-EPOCHS = 10
+EPOCHS = 1
 DATASET = "."
 INPUT_DIM = (224, 224, 3)
 
 config = {
     'dataset': 'voc',
-    'data_mode': 'on_memory',
-    'model_info': 'begin',
+    'data_mode': 'none',
+    'model_info': 'pretained',
     'batch_size': BATCH_SIZE,
     'img_h': INPUT_DIM[0],
     'img_w': INPUT_DIM[1],
     'img_c': INPUT_DIM[2],
     'num_class': NUM_CLASSES,
     'epochs': EPOCHS,
-    'shuffle': 1
+    'shuffle': 1,
+    'do_augment':1
 }
 
 path_name = "tmp"
@@ -70,7 +71,7 @@ class Mobilenet_Train(Train):
             self.model = Mobilenetv2.getKerasModelBase(
                     num_class=NUM_CLASSES,
                     output='sigmoid',
-                    fix_layer=20
+                    fix_layer=156
                     )
         self.model.summary()
 
@@ -78,7 +79,7 @@ class Mobilenet_Train(Train):
         optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         #optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
-        self.model.compile(loss='categorical_crossentropy',
+        self.model.compile(loss='binary_crossentropy',
               optimizer=optimizer,
               metrics=['accuracy'])
 
@@ -86,7 +87,7 @@ class Mobilenet_Train(Train):
         file = path_name + '/' + model_name + '-best.h5'
         if os.path.exists(file):
             self.model.load_weights(file)
-            fix_layer = 20
+            fix_layer = 156
             for layer in self.model.layers:
                 layer.trainable=False
             # or if we want to set the first 20 layers of the network to be non-trainable

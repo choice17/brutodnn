@@ -151,7 +151,7 @@ class Mobilenetv2(object):
     def getKerasModel(*args, **kwargs):
         return MobileNetV2(*args, **kwargs)
 
-    def getKerasModelBase(num_class=CLASS_NUM, output='softmax', fix_layer=20):
+    def getKerasModelBase(num_class=CLASS_NUM, output='softmax', fix_layer=20, dropout=0.5):
         base_model=MobileNetV2(weights='imagenet',include_top=False) #imports the mobilenet model and discards the last 1000 neuron layer.
         x=base_model.output
         x=GlobalAveragePooling2D()(x)
@@ -162,8 +162,10 @@ class Mobilenetv2(object):
         #preds=Dense(num_class,activation=output)(x) #final layer with softmax activation
         x = Conv2D(1024, (1, 1), padding='same')(x)
         x = Mobilenetv2.relu6()(x)
+        if dropout: x = Dropout(dropout)(x)
         x = Conv2D(1024, (1, 1), padding='same')(x)
         x = Mobilenetv2.relu6()(x)
+        if dropout: x = Dropout(dropout)(x)
         x = Conv2D(num_class, (1, 1), padding='same')(x)
         x = Activation(output)(x)
         outputs = Reshape((num_class,))(x)

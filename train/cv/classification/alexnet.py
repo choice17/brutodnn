@@ -14,9 +14,9 @@ import os
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-BATCH_SIZE = 8
+BATCH_SIZE = 16
 NUM_CLASSES = 20
-EPOCHS = 1
+EPOCHS = 5
 DATASET = "."
 INPUT_DIM = (227, 227, 3)
 
@@ -59,7 +59,7 @@ class Alexnet_Train(Train):
         self.config = config
 
     def getData(self):
-        self.voc = VOC()
+        self.voc = VOC(VOC.VOC_ALL)
         self.voc.getFileList()
         self.voc.getAnnot()
         self.voc.getClassAnnot()
