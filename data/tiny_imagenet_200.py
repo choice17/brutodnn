@@ -93,10 +93,12 @@ class TINY_IMAGENET200(object):
                 for entry in annot_path:
                     if entry == []:
                         continue
-                    if entry == ['']:
+                    elif entry == ['']:
+                        continue
+                    elif entry == '':
                         continue
                     annot = entry.split('\t')
-                    img_path = '{}{}{}{}'.format(self.dirs,self.train_path,self.images_path, annot[0])
+                    img_path = '{}{}{}/{}{}'.format(self.dirs,self.train_path,_cls,self.images_path,annot[0])
                     train_img_list.append(img_path)
                     cls_info = [annot[0].split('_')[0]]
                     train_annot_list.append(cls_info + annot[1:])
@@ -114,8 +116,11 @@ class TINY_IMAGENET200(object):
         for entry in annot_list:
             if entry == []:
                 continue
-            if entry == ['']:
+            elif entry == ['']:
                 continue
+            elif entry == '':
+                continue
+
             annot = entry.split('\t')
             img_path = '{}{}{}{}'.format(self.dirs,self.val_path, self.images_path, annot[0])
             val_img_list.append(img_path)
@@ -247,11 +252,11 @@ class TRAIN_BATCH(Sequence):
 class VAL_BATCH(Sequence):
     def __init__(self, tiny_imagenet200):
         self.config = tiny_imagenet200.config
-        self.valid_label = tiny_imagenet200.valid_label
-        self.valid_img_list = tiny_imagenet200.valid_img_list
+        self.valid_label = tiny_imagenet200.val_label
+        self.valid_img_list = tiny_imagenet200.val_img_list
         self.shuffle = tiny_imagenet200.config['shuffle']
         self.generate_list = list(range(len(self)))
-        print("[INFO] total %d validation images" % len(tiny_imagenet200.valid_img_list))
+        print("[INFO] total %d validation images" % len(tiny_imagenet200.val_img_list))
 
     def __len__(self):
         return int((self.valid_label.shape[0] / self.config['batch_size']) + 0.5)
