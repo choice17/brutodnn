@@ -10,10 +10,44 @@ from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoi
 from utils.utils import imshow
 import tensorflow as tf
 import numpy as np
+#from sklearn.metrics import confusion_matrix
 
 import os
 from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
+print(device_lib.list_local_devices)      
+
+# https://datascience.stackexchange.com/questions/13490/how-to-set-class-weights-for-imbalanced-classes-in-keras
+"""
+conf_matr = np.zeros((NUM_CLASSES,2,2))
+rate = 0.5
+for x_batch, y_batch in valid_batch:
+    pred = t.model.predict(x_batch)
+    pred[pred >= rate] = 1
+    pred[pred < rate] = 0
+    for i in range(NUM_CLASSES):
+      cm = confusion_matrix(pred[:,i:i+1], y_batch[:,i:i+1],[1,0])
+      conf_matr[i] += np.array(cm)
+
+"""
+"""
+https://github.com/keras-team/keras/issues/2115
+def w_categorical_crossentropy(y_true, y_pred, weights):
+    nb_cl = len(weights)
+    final_mask = K.zeros_like(y_pred[:, 0])
+    y_pred_max = K.max(y_pred, axis=1)
+    y_pred_max = K.reshape(y_pred_max, (K.shape(y_pred)[0], 1))
+    y_pred_max_mat = K.cast(K.equal(y_pred, y_pred_max), K.floatx())
+    for c_p, c_t in product(range(nb_cl), range(nb_cl)):
+        final_mask += (weights[c_t, c_p] * y_pred_max_mat[:, c_p] * y_true[:, c_t])
+    return K.categorical_crossentropy(y_pred, y_true) * final_mask
+
+w_array = np.ones((10,10))
+w_array[1, 7] = 1.2
+w_array[7, 1] = 1.2
+
+ncce = partial(w_categorical_crossentropy, weights=np.ones((10,10)))
+compile(loss = ncce)
+"""
 
 BATCH_SIZE = 8
 NUM_CLASSES = 20
@@ -39,6 +73,12 @@ path_name = "tmp"
 model_name = "mobilenet"
 file_name = "mobilenetv2.pb"
 log_path = 'logs'
+
+def K_binary_loss(y_true, y_pred):
+    loss = K.binary_crossentropy(y_true, y_pred)
+    #loss2 = K.categorical_crossentropy(t, p)
+    loss = K.cast(K.equal(y_true,1), K.floatx()) * loss + loss
+    return loss
 
 if not os.path.exists(path_name): os.mkdir(path_name)
 if not os.path.exists(log_path): os.mkdir(log_path)
@@ -79,9 +119,15 @@ class Mobilenet_Train(Train):
         optimizer = Adam(lr=1e-4, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         #optimizer = SGD(lr=1e-4, decay=0.0005, momentum=0.9)
         #optimizer = RMSprop(lr=1e-5, rho=0.9, epsilon=1e-08, decay=0.0)
+
+        self.model.compile(loss=K_binary_loss,
+              optimizer=optimizer,
+              metrics=['accuracy'])
+        """
         self.model.compile(loss='binary_crossentropy',
               optimizer=optimizer,
               metrics=['accuracy'])
+              """
 
     def fit(self):
         file = path_name + '/' + model_name + '-best.h5'
@@ -126,6 +172,7 @@ class Mobilenet_Train(Train):
                     validation_steps = len(valid_batch),
                     callbacks        = [early_stop, checkpoint, tensorboard], 
                     max_queue_size   = 3)
+        self.valid_batch = valid_batch
 
     def run(self):
         self.initModel()
@@ -133,3 +180,13 @@ class Mobilenet_Train(Train):
         self.buildTrainKeras()
         self.fit()
         self.save(file_name=file_name, path_name=path_name)
+
+    """
+    def evaluate(self):
+        conf_matr = np.zeros((NUM_CLASSES,NUM_CLASSES))
+        for x_batch, y_batch in self.valid_batch:
+            pred = self.model.predict(x_batch)
+            cm = confusion_matrix(pred, y_batch)
+            conf_matr += np.array(cm)
+        print(conf_matr)
+    """
